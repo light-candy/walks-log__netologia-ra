@@ -1,26 +1,32 @@
-import React from 'react';
-
+import React, { useState } from 'react';
 import { Form } from './Form';
 import { WalkList } from './WalkList'
 
-export class Logger extends React.Component {
-    state = {
-        walks: [],
-    };
+export function Logger() {
 
-handleAdd = walk => {
-    this.setState({walks:[ walk, ...this.state.walks]});
-}
+  const [walks, setWalks] = useState([]);
 
-removeWalk = date => {
-    this.setState(this.state.walks.filter(walk => walk.date !== date));
-}
-    render() {
-        return (
-            <>
-                <Form onAdd={this.handleAdd}  />
-                <WalkList walks = {this.state.walks} />
-             </>
-        );
-    }
+  const handleAdd = walk => {
+    setWalks(prevWalks => {
+        prevWalks.forEach(o => {
+            if (o.date === walk.date) {
+                walk.km = o.km + walk.km;
+                prevWalks.splice(prevWalks.indexOf(o), 1);
+            }
+        });
+        return( [...prevWalks, walk]);
+    });
+  }
+
+
+  const removeWalk = date => {
+    setWalks(prevWalks => prevWalks.filter(walk => walk.date !== date));
+  }
+
+  return(
+        <>
+         <Form onAdd={handleAdd} />
+         <WalkList walks = {walks} removeWalk={removeWalk} />
+        </>
+  );
 }
